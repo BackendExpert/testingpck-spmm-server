@@ -1,5 +1,6 @@
 const User = require("../Model/User");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const AuthController = {
     signup: async(req, res) => {
@@ -22,17 +23,18 @@ const AuthController = {
             if(checkUser){
                 return res.josn({ Error: 'User Already exists....'})
             }
+            else{
+                const hashPass = await bcrypt.hash(password, 10)
 
-            const hashPass = await bcrypt.hash(password, 10);
-
-            const newUser = new User({
-                username: username,
-                email: email,
-                password: hashPass,                
-            })
-
-            const resutlUser = await newUser.save()
-            return res.json({Status: "Success"})
+                const newUser = new User({
+                    username: username,
+                    email: email,
+                    password: hashPass,                
+                })
+    
+                const resutlUser = await newUser.save()
+                return res.json({Status: "Success"})
+            }
         }
         catch(err) {
             console.log(err)
@@ -52,7 +54,7 @@ const AuthController = {
                 const checkPass = await bcrypt.compare(password, checkUser.password); 
 
                 if(checkPass){
-                    if(checkUser.is_active === 0){
+                    if(checkUser.is_active === false){
                         return res.json({ Error: 'Your account not Active State'})
                     }
                     else{
