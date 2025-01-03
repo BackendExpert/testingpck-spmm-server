@@ -37,6 +37,40 @@ const AuthController = {
         catch(err) {
             console.log(err)
         }
+    },
+
+    signin: async(req, res) => {
+        try{
+            const {
+                email,
+                password
+            } = req.body
+
+            const checkUser = await User.findOne({ email: email })
+
+            if(checkUser){
+                const checkPass = await bcrypt.compare(password, checkUser.password); 
+
+                if(checkPass){
+                    if(checkUser.is_active === 0){
+                        return res.json({ Error: 'Your account not Active State'})
+                    }
+                    else{
+                        const token = jwt.sign({ id: checkUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                        return res.json({ Status: "Success", Result: checkUser, Token: token });
+                    }
+                }
+                else{
+                    return res.json({ Error: "Password Not Match..."})
+                }
+            }
+            else{
+                return res.json({Error: "User Not Found..."})
+            }
+        }
+        catch(err){
+            console.log(err)
+        }
     }
 };
 
