@@ -21,7 +21,7 @@ const AuthController = {
             )
 
             if(checkUser){
-                return res.josn({ Error: 'User Already exists....'})
+                return res.json({ Error: 'User Already exists....'})
             }
             else{
                 const hashPass = await bcrypt.hash(password, 10)
